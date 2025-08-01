@@ -25,6 +25,8 @@ public class AvroSerializer implements Serializer<SpecificRecordBase> {
                 writer.write(data, encoder);
                 encoder.flush();
                 result = out.toByteArray();
+            } else {
+                result = new byte[0];
             }
             return result;
         } catch (IOException ex) {

@@ -21,13 +21,13 @@ public class CollectorController {
 
     @PostMapping("/sensors")
     public void sensorEvent(@RequestBody @Valid SensorEvent sensorEvent) {
-        log.warn("getting sensor event {}", sensorEvent);
+        log.info("getting sensor event {}", sensorEvent);
         service.sendSensorEvent(sensorEvent);
     }
 
     @PostMapping("/hubs")
     public void hubEvent(@RequestBody @Valid HubEvent hubEvent) {
-        log.warn("getting hub event {}", hubEvent);
+        log.info("getting hub event {}", hubEvent);
         service.sendHubEvent(hubEvent);
     }
 }

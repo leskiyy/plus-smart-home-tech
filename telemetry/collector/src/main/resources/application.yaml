@@ -1,9 +1,10 @@
-my:
+spring:
   kafka:
     bootstrap-server: "localhost:9092"
     producer:
       key-serializer: "org.apache.kafka.common.serialization.StringSerializer"
       value-serializer: "ru.practicum.telemetry.serialization.AvroSerializer"
-    topics:
-      hub: "telemetry.hubs.v1"
-      sensor: "telemetry.sensors.v1"
+
+topic:
+  hub-event: "telemetry.hubs.v1"
+  sensor-event: "telemetry.sensors.v1"

@@ -2,9 +2,8 @@ package ru.practicum.telemetry.service;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.avro.specific.SpecificRecordBase;
-import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import ru.practicum.telemetry.dto.hub.*;
 import ru.practicum.telemetry.dto.sensor.*;
@@ -14,19 +13,19 @@ import ru.yandex.practicum.kafka.telemetry.event.*;
 @RequiredArgsConstructor
 public class CollectorService {
 
-    private final KafkaProducer<String, SpecificRecordBase> kafkaProducer;
+    @Value("${topic.sensor-event}")
+    private String sensorTopic = "telemetry.sensors.v1";
+    @Value("${topic.hub-event}")
+    private String hubTopic = "telemetry.hubs.v1";
 
-    @Value("${my.kafka.topics.hub}")
-    private String hubTopic;
-    @Value("${my.kafka.topics.sensor}")
-    private String sensorTopic;
+    private final KafkaTemplate<String, SpecificRecordBase> kafkaProducer;
 
     public void sendSensorEvent(SensorEvent sensorEvent) {
-        kafkaProducer.send(new ProducerRecord<>(sensorTopic, sensorEvent.getHubId(), mapToRecord(sensorEvent)));
+        kafkaProducer.send(sensorTopic, sensorEvent.getHubId(), mapToRecord(sensorEvent));
     }
 
     public void sendHubEvent(HubEvent hubEvent) {
-        kafkaProducer.send(new ProducerRecord<>(hubTopic, hubEvent.getHubId(), mapToRecord(hubEvent)));
+        kafkaProducer.send(hubTopic, hubEvent.getHubId(), mapToRecord(hubEvent));
     }
 
     private SpecificRecordBase mapToRecord(HubEvent hubEvent) {
