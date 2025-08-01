@@ -18,14 +18,14 @@ public class CollectorService {
     @Value("${topic.hub-event}")
     private String hubTopic = "telemetry.hubs.v1";
 
-    private final KafkaTemplate<String, SpecificRecordBase> kafkaProducer;
+    private final KafkaTemplate<String, SpecificRecordBase> kafkaTemplate;
 
     public void sendSensorEvent(SensorEvent sensorEvent) {
-        kafkaProducer.send(sensorTopic, sensorEvent.getHubId(), mapToRecord(sensorEvent));
+        kafkaTemplate.send(sensorTopic, sensorEvent.getHubId(), mapToRecord(sensorEvent));
     }
 
     public void sendHubEvent(HubEvent hubEvent) {
-        kafkaProducer.send(hubTopic, hubEvent.getHubId(), mapToRecord(hubEvent));
+        kafkaTemplate.send(hubTopic, hubEvent.getHubId(), mapToRecord(hubEvent));
     }
 
     private SpecificRecordBase mapToRecord(HubEvent hubEvent) {
