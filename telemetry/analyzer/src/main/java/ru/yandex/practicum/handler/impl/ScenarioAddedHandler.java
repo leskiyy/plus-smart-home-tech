@@ -9,7 +9,6 @@ import ru.yandex.practicum.kafka.telemetry.event.HubEventAvro;
 import ru.yandex.practicum.kafka.telemetry.event.ScenarioAddedEventAvro;
 import ru.yandex.practicum.kafka.telemetry.event.ScenarioConditionAvro;
 import ru.yandex.practicum.repository.ScenarioRepository;
-import ru.yandex.practicum.repository.SensorRepository;
 
 import java.util.Map;
 

@@ -8,8 +8,6 @@ import ru.yandex.practicum.kafka.telemetry.event.DeviceAddedEventAvro;
 import ru.yandex.practicum.kafka.telemetry.event.HubEventAvro;
 import ru.yandex.practicum.repository.SensorRepository;
 
-import java.time.Instant;
-
 @Component
 @RequiredArgsConstructor
 public class DeviceAddedHandler implements HubEventHandler {
