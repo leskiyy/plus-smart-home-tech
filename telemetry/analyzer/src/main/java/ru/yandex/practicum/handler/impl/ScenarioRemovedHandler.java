@@ -10,6 +10,8 @@ import ru.yandex.practicum.repository.ActionRepository;
 import ru.yandex.practicum.repository.ConditionRepository;
 import ru.yandex.practicum.repository.ScenarioRepository;
 
+import java.util.Optional;
+
 @Component
 @RequiredArgsConstructor
 public class ScenarioRemovedHandler implements HubEventHandler {
@@ -28,7 +30,13 @@ public class ScenarioRemovedHandler implements HubEventHandler {
         ScenarioRemovedEventAvro scenarioRemovedEventAvro = (ScenarioRemovedEventAvro) event.getPayload();
         String name = scenarioRemovedEventAvro.getName();
 
-        Scenario scenario = scenarioRepository.findByHubIdAndName(event.getHubId(), name).orElseThrow();
+        Optional<Scenario> optScenario = scenarioRepository.findByHubIdAndName(event.getHubId(), name);
+        Scenario scenario;
+        if (optScenario.isEmpty()) {
+            return;
+        } else {
+            scenario = optScenario.get();
+        }
 
         conditionRepository.deleteAll(scenario.getConditions().values());
         actionRepository.deleteAll(scenario.getActions().values());

@@ -1,6 +1,7 @@
 package ru.yandex.practicum.listener;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,7 @@ import java.util.Map;
 import java.util.Objects;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class SnapshotListener {
 
@@ -34,6 +36,8 @@ public class SnapshotListener {
     @Transactional(readOnly = true)
     @KafkaListener(topics = "${topic.snapshot}", containerFactory = "snapshotListenerFactory")
     public void listenSnapshots(SensorsSnapshotAvro sensorsSnapshotAvro) {
+        log.info("Getting snapshot {}", sensorsSnapshotAvro);
+
         String hubId = sensorsSnapshotAvro.getHubId();
         List<Scenario> scenarios = scenarioRepository.findByHubId(hubId);
         Map<String, SensorStateAvro> sensorsState = sensorsSnapshotAvro.getSensorsState();
@@ -66,6 +70,7 @@ public class SnapshotListener {
                             .setValue(action.getValue())
                             .build())
                     .build();
+            log.info("Sending action request {}", request);
             hubRouterClient.handleDeviceAction(request);
         });
 
