@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.dto.store.ProductCategory;
 import ru.yandex.practicum.dto.store.ProductDto;
 import ru.yandex.practicum.dto.store.ProductState;
@@ -17,6 +18,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
@@ -28,6 +30,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional
     public ProductDto addProduct(ProductDto productDto) {
         Product entity = mapper.toEntity(productDto);
         Product saved = productRepository.save(entity);
@@ -35,6 +38,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional
     public ProductDto updateProduct(ProductDto productDto) {
         Product product = productRepository.findById(productDto.getProductId())
                 .orElseThrow(() -> new ProductNotFoundException(404, "Product id=" + productDto.getProductId() + "not found"));
@@ -44,6 +48,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional
     public ProductDto deleteProduct(UUID productId) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ProductNotFoundException(404, "Product id=" + productId + "not found"));
@@ -53,6 +58,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional
     public ProductDto updateQuantity(SetProductQuantityStateRequest updateQuantityDto) {
         Product product = productRepository.findById(updateQuantityDto.getProductId())
                 .orElseThrow(() -> new ProductNotFoundException(404, "Product id=" + updateQuantityDto.getProductId() + "not found"));

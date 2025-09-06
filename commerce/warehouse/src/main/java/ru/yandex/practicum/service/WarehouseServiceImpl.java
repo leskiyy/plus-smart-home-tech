@@ -1,8 +1,14 @@
 package ru.yandex.practicum.service;
 
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import ru.yandex.practicum.client.ShoppingStoreClient;
 import ru.yandex.practicum.dto.cart.ShoppingCartDto;
+import ru.yandex.practicum.dto.store.QuantityState;
+import ru.yandex.practicum.dto.store.SetProductQuantityStateRequest;
 import ru.yandex.practicum.dto.warehouse.AddProductToWarehouseRequest;
 import ru.yandex.practicum.dto.warehouse.AddressDto;
 import ru.yandex.practicum.dto.warehouse.BookedProductsDto;
@@ -18,10 +24,13 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class WarehouseServiceImpl implements WarehouseService {
 
+    private final ShoppingStoreClient shoppingStoreClient;
     private final WarehouseProductRepository warehouseProductRepository;
     private final WarehouseProductMapper mapper;
 
@@ -30,7 +39,15 @@ public class WarehouseServiceImpl implements WarehouseService {
         if (warehouseProductRepository.existsById(request.getProductId())) {
             throw new NoSpecifiedProductInWarehouseException(400, "Product id=" + request.getProductId() + "has already booked");
         }
-        warehouseProductRepository.save(mapper.toEntity(request));
+        WarehouseProduct saved = warehouseProductRepository.save(mapper.toEntity(request));
+        try {
+            shoppingStoreClient.updateQuantityState(SetProductQuantityStateRequest.builder()
+                    .productId(saved.getProductId())
+                    .quantityState(QuantityState.ENDED)
+                    .build());
+        } catch (FeignException e) {
+            log.info("Catching error trying to change QuantityState on product id={}", saved.getProductId());
+        }
     }
 
     @Override
@@ -70,7 +87,17 @@ public class WarehouseServiceImpl implements WarehouseService {
                 .orElseThrow(() -> new NoSpecifiedProductInWarehouseException(400, "No info about product id=" + request.getProductId()));
 
         warehouseProduct.setQuantity(request.getQuantity());
-        warehouseProductRepository.save(warehouseProduct);
+        WarehouseProduct saved = warehouseProductRepository.save(warehouseProduct);
+        Integer quantity = saved.getQuantity();
+        try {
+            shoppingStoreClient.updateQuantityState(SetProductQuantityStateRequest.builder()
+                    .productId(saved.getProductId())
+                    .quantityState(quantity == 0 ? QuantityState.ENDED : quantity < 10 ? QuantityState.FEW :
+                                    quantity <= 100 ? QuantityState.ENOUGH : QuantityState.MANY)
+                    .build());
+        } catch (FeignException e) {
+            log.info("Catching error trying to change QuantityState on product id={}", saved.getProductId());
+        }
     }
 
     @Override
