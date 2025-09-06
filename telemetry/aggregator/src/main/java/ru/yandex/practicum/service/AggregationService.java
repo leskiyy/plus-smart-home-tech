@@ -39,7 +39,7 @@ public class AggregationService {
 
 
         if (sensorStateAvro != null && (sensorStateAvro.getData().equals(event.getPayload())
-         || sensorsSnapshotAvro.getTimestamp().isAfter(event.getTimestamp()))) {
+                                        || sensorsSnapshotAvro.getTimestamp().isAfter(event.getTimestamp()))) {
             return;
         }
 
