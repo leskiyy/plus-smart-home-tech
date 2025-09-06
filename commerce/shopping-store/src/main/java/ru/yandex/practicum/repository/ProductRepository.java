@@ -10,6 +10,5 @@ import ru.yandex.practicum.entity.Product;
 import java.util.UUID;
 
 public interface ProductRepository extends JpaRepository<Product, UUID> {
-    @Query("select p from Product p where p.productCategory = ?1 and p.productState = 'ACTIVE'")
     Page<Product> findAllByProductCategory(ProductCategory category, Pageable pageable);
 }
