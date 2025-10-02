@@ -112,7 +112,7 @@ public class DeliveryServiceImpl implements DeliveryService {
         } else {
             addressK = ADDRESS_K;
         }
-        deliveryPrice = deliveryPrice + deliveryPrice + addressK;
+        deliveryPrice = deliveryPrice + deliveryPrice * addressK;
 
         return deliveryPrice;
     }

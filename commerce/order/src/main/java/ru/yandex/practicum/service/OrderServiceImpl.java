@@ -73,7 +73,7 @@ public class OrderServiceImpl implements OrderService {
         saved.setPaymentId(payment.getPaymentId());
         saved.setState(OrderState.ON_PAYMENT);
 
-        return null;
+        return orderMapper.toDto(saved);
     }
 
     @Override
